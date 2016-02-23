@@ -1,5 +1,7 @@
 
-## What is PEcAn?
+## What is PEcAn
+
+[![Join the chat at https://gitter.im/araiho/pecan](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/araiho/pecan?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Join the chat at https://gitter.im/PecanProject/pecan](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/PecanProject/pecan?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -15,7 +17,7 @@ See ["Getting Started"](https://github.com/PecanProject/pecan/wiki/Getting-start
 
 ### Installation
 
-Complete instructions on how to install PEcAn can be found in the [WIKI Installation Page](https://github.com/PecanProject/pecan/wiki/Installing-PEcAn). To get PEcAn up and running you will need to have [R](http://www.r-project.org) as well as [PostgreSQL](http://www.postgresql.org) installed. You can also [download a Virtual Machine](http://opensource.ncsa.illinois.edu/projects/artifacts.php?key=PECAN) which has all the components as well as PEcAn installed. To run this Virtual Machine you will need to have [VirtualBox](http://virtualbox.org) installed
+Complete instructions on how to install PEcAn can be found in the [WIKI Installation Page](https://github.com/PecanProject/pecan/wiki/Installing-PEcAn). To get PEcAn up and running you will need to have [R](http://www.r-project.org) as well as [PostgreSQL](http://www.postgresql.org) installed. You can also [download a Virtual Machine](http://isda.ncsa.illinois.edu/download/index.php?project=PEcAn&sort=category) which has all the components as well as PEcAn installed. To run this Virtual Machine you will need to have [VirtualBox](http://virtualbox.org) installed
 
 ### Web Interface Demo
 
@@ -41,9 +43,9 @@ The demo instance only allows for runs at pecan.ncsa.illinois.edu. Once you have
 
 ## Acknowledgements
 
-This material is based upon work supported by the Energy Biosciences Institute, the National Science Foundation under Grants No. 1062547 and 1062204, and the Department of Energy. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation. PEcAn is a collaboration among research groups at the Carl Woese Institute for Genomic Biology at the University of Illinois, the Department of Earth And Environment at Boston University, the Image Spatial Data Analysis group at the National Center for Supercomputing Applications, and the Department of Atmospheric & Oceanic Sciences at the University Wisconsin-Madison.
+This material is based upon work supported by the Energy Biosciences Institute and the National Science Foundation under Grant No. 1062547 and 1062204. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation. PEcAn is a collaboration among research groups at the Energy Biosciences Institute at the University of Illinois, the Department of Earth And Environment at Boston University, the Image Spatial Data Analysis group at NCSA, and the Department of Atmospheric & Oceanic Sciences at the University Wisconsin-Madison.
 
-BETYdb is a product of the Energy Biosciences Institute at the University of Illinois at Urbana-Champaign. We gratefully acknowledge the great effort of other researchers who generously made their own data available for further study.
+BETY-db is a product of the Energy Biosciences Institute at the University of Illinois at Urbana-Champaign. We gratefully acknowledge the great effort of other researchers who generously made their own data available for further study.
 
 ## License
 
