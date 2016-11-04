@@ -45,8 +45,8 @@ write.config.LINKAGES <- function(defaults = NULL, trait.values, settings, run.i
   
   iplot <- 1
   nyear <- length(year)
-  bgs <- 120
-  egs <- 273
+  bgs <- 120 #beginning growing season #driver #should be different by site
+  egs <- 273 #end growing season #driver #should be different by site
   max.ind <- 15000
   plat <- abs(as.numeric(settings$run$site$lat))
   
@@ -83,6 +83,7 @@ write.config.LINKAGES <- function(defaults = NULL, trait.values, settings, run.i
   
   climate_file <- settings$run$inputs$met$path
   load(climate_file)
+  ### Right now all of the paleon sites don't have years associated with temp and precip
   temp.mat <- temp.mat[start.year:end.year - start.year + 1, ]
   precip.mat <- precip.mat[start.year:end.year - start.year + 1, ]
   
@@ -163,6 +164,14 @@ write.config.LINKAGES <- function(defaults = NULL, trait.values, settings, run.i
     restartfile <- file.path(settings$rundir, run.id, "linkages.restart.Rdata")
   } else {
     restartfile <- NULL
+  }
+  
+  ### Look for initial conditions in the settings file
+  IC.path <- settings$run$inputs$initial_conditions
+  ### If there is an IC file, restart model with initial conditions
+  if(!is.null(IC.path)){
+    restart <- TRUE
+    restartfile <- file.path(IC.path, "linkages.restart.Rdata")
   }
   #-----------------------------------------------------------------------
   # create launch script (which will create symlink)
