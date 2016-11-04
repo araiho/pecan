@@ -13,7 +13,7 @@
 ##' @title Writes a configuration files for SIPNET model
 ##' @export
 ##' @author Michael Dietze
-write.config.SIPNET <- function(defaults, trait.values, settings, run.id, inputs = NULL, IC = NULL, 
+write.config.SIPNET <- function(defaults, trait.values, settings, run.id, inputs = NULL, 
                                 restart = NULL, spinup = NULL) {
   ### WRITE sipnet.in
   template.in <- system.file("sipnet.in", package = "PEcAn.SIPNET")
@@ -99,7 +99,9 @@ write.config.SIPNET <- function(defaults, trait.values, settings, run.id, inputs
   param <- read.table(template.param)
   
   #### write INITAL CONDITIONS here ####
-  if (!is.null(IC)) {
+  IC.path <- settings$run$inputs$initial_conditions$path
+  if (!is.null(IC.path)) {
+    load(paste0(settings$run$inputs$initial_conditions$path,'/IC.Rdata'))
     ic.names <- names(IC)
     ## plantWoodInit gC/m2
     if ("plantWood" %in% ic.names) {
