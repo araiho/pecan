@@ -5,7 +5,6 @@
 ##' @param settings    PEcAn settings object
 ##' @param obs.mean    list of observations of the means of state variable (time X nstate)
 ##' @param obs.cov     list of observations of covariance matrices of state variables (time X nstate X nstate)
-##' @param IC          initial conditions
 ##' @param Q           process covariance matrix given if there is no data to estimate it
 ##' 
 ##' @description State Variable Data Assimilation: Ensemble Kalman Filter
@@ -13,7 +12,7 @@
 ##' @return NONE
 ##' @export
 ##' 
-sda.enkf <- function(settings, obs.mean, obs.cov, IC = NULL, Q = NULL) {
+sda.enkf <- function(settings, obs.mean, obs.cov, Q = NULL) {
   
   ymd_hms <- lubridate::ymd_hms
   hms     <- lubridate::hms
@@ -126,7 +125,6 @@ sda.enkf <- function(settings, obs.mean, obs.cov, IC = NULL, Q = NULL) {
   ### perform initial set of runs                                       ###
   ###-------------------------------------------------------------------###  
   run.id <- list()
-  X <- IC
   
   ## Load Parameters
   if (sample_parameters == TRUE) {
@@ -173,8 +171,7 @@ sda.enkf <- function(settings, obs.mean, obs.cov, IC = NULL, Q = NULL) {
                                          trait.values = params[[i]], 
                                          settings = settings, 
                                          run.id = run.id[[i]], 
-                                         inputs = inputs, 
-                                         IC = IC[i, ]))
+                                         inputs = inputs))
     
     ## write a README for the run
     cat("runtype     : sda.enkf\n",
