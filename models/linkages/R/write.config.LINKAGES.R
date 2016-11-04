@@ -24,24 +24,16 @@
 ##' @author Ann Raiho, Betsy Cowdery
 ##-------------------------------------------------------------------------------------------------#
 write.config.LINKAGES <- function(defaults = NULL, trait.values, settings, run.id, 
-                                  restart = NULL, spinup = NULL, inputs = NULL, IC = NULL) {
-  # 850-869 repeated to fill 1000 years
-  if (is.null(restart)) {
-    restart <- FALSE # why not have restart default to FALSE above?
-  }
-  if (is.null(spinup)) {
-    spinup <- FALSE # why not have spinup default to FALSE above?
-  }
-  
+                                  restart = FALSE, spinup = FALSE, inputs = NULL) {
   library(linkages)
   
   # find out where to write run/ouput
   rundir <- file.path(settings$host$rundir, run.id)
-  if (!file.exists(rundir)) {  # why not use `dir.exists`?
+  if (dir.exists(rundir)) {
     dir.create(rundir)
   }
   outdir <- file.path(settings$host$outdir, run.id)
-  if (!file.exists(outdir)) {  # why not use `dir.exists`?
+  if (dir.exists(outdir)) {
     dir.create(outdir)
   }
   
