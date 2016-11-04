@@ -12,7 +12,7 @@
 ##' @name write.config.SIPNET
 ##' @title Writes a configuration files for SIPNET model
 ##' @export
-##' @author Michael Dietze
+##' @author Michael Dietze and Ann Raiho
 write.config.SIPNET <- function(defaults, trait.values, settings, run.id, inputs = NULL, 
                                 restart = NULL, spinup = NULL) {
   ### WRITE sipnet.in
