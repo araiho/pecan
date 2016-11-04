@@ -64,7 +64,8 @@ met2model.LINKAGES <- function(in.path, in.prefix, outfolder, start_date, end_da
   
   nyear <- length(year)  # number of years to simulate
   
-  month_matrix_precip <- matrix(NA, nyear, 12)
+  month_matrix_precip <- matrix(NA, nyear, 13)
+  month_matrix_precip[,13] <- seq(start_year, end_year, 1)
   DOY_vec_hr <- c(1, c(32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 365) * 4)
   
   for (i in seq_len(nyear)) {
@@ -86,7 +87,8 @@ met2model.LINKAGES <- function(in.path, in.prefix, outfolder, start_date, end_da
     # if(i%%100==0) cat(i,' '); flush.console()
   }
   
-  month_matrix_temp_mean <- matrix(NA, nyear, 12)
+  month_matrix_temp_mean <- matrix(NA, nyear, 13)
+  month_matrix_temp_mean[,13] <- seq(start_year, end_year, 1)
   
   for (i in seq_len(nyear)) {
     ncin <- ncdf4::nc_open(file.path(in.path, paste0(in.prefix, ".", year[i], ".nc")))
