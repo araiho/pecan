@@ -91,8 +91,8 @@ write.config.LINKAGES <- function(defaults = NULL, trait.values, settings, run.i
   
   climate_file <- settings$run$inputs$met$path
   load(climate_file)
-  temp.mat <- temp.mat[start.year:end.year - start.year + 1, ]
-  precip.mat <- precip.mat[start.year:end.year - start.year + 1, ]
+  temp.mat <- temp.mat[temp.mat[,13] == start.year:end.year, ]
+  precip.mat <- precip.mat[precip.mat[,13] == start.year:end.year, ]
   
   basesc <- 74
   basesn <- 1.64
