@@ -64,56 +64,64 @@ load_data_paleon_sda <- function(settings){
     format_full <- format <- PEcAn.DB::query.format.vars(input.id = input.id[[i]], bety, format.id = NA, var.ids=NA)
     
 
-    ### Tree Ring Data Product
-    if(format_id[[i]] == '1000000040'){
-      # hack instead of changing the units in BETY format for now
-      # I don't want load_data to convert anything
-      # data itself is in Mg / ha 
-      format$vars[1,1] <-  format$vars[1,8] <- format$vars[1,10] <- "AbvGrndWood"
-      format$vars[1,4] <- "kg C m-2"
-      
-      format$vars[4,1] <-  format$vars[4,8] <- format$vars[4,10] <- "GWBI"
-      format$vars[4,4] <- "kg C m-2 s-1"
-    }
-    
+    # ### Tree Ring Data Product
+    # if(format_id[[i]] == '1000000040'){
+    #   # hack instead of changing the units in BETY format for now
+    #   # I don't want load_data to convert anything
+    #   # data itself is in Mg / ha 
+    #   format$vars[1,1] <-  format$vars[1,8] <- format$vars[1,10] <- "AbvGrndWood"
+    #   format$vars[1,4] <- "Mg ha-1"
+    #   
+    #   format$vars[2,1] <-  format$vars[4,8] <- format$vars[4,10] <- "GWBI"
+       format$vars[2,4] <- "kg m-2 s-1"
+    # }
+    # 
     format$na.strings <- 'NA'
     time.row <- format$time.row
     time.type <- format$vars$input_units[time.row] #THIS WONT WORK IF TIMESTEP ISNT ANNUAL
     
       # ---- LOAD INPUT DATA ---- #
       PEcAn.logger::logger.info(paste('Using PEcAn.benchmark::load_data.R on format_id',format_id[[i]],'-- may take a few minutes'))
-      obvs[[i]] <- PEcAn.benchmark::load_data(data.path, format, start_year = lubridate::year(start_date), end_year = lubridate::year(end_date), site)
-    
+      
+      #tic()
+      obvs[[i]] <- PEcAn.benchmark::load_data(data.path, 
+                                              format, 
+                                              start_year = lubridate::year(start_date), 
+                                              end_year = lubridate::year(end_date),
+                                              site)
+      obvs.save <- obvs[[i]]
+      #toc()
+      
       variable <- intersect(var.names,colnames(obvs[[i]]))
     
     ### Tree Ring Data Product
     if(format_id[[i]] == '1000000040'){
       obvs[[i]] <- obvs[[i]][obvs[[i]]$model_type=='Model RW + Census',]
-      obvs[[i]]$AbvGrndWood <- obvs[[i]]$AbvGrndWood * biomass2carbon #* kgm2Mgha 
-      obvs[[i]]$GWBI <- obvs[[i]]$GWBI * biomass2carbon  #* kgms2Mghayr 
+      obvs[[i]]$AbvGrndWood <- obvs[[i]]$AbvGrndWood * biomass2carbon #load_data doesn't do C 
+      obvs[[i]]$GWBI <- obvs[[i]]$GWBI * biomass2carbon  #load_data doesn't do C
       arguments <- list(.(year, MCMC_iteration, site_id), .(variable))
       arguments2 <- list(.(year), .(variable))
       arguments3 <- list(.(MCMC_iteration), .(variable), .(year))
       
       dataset <- obvs[[i]]
-      
+    
       ### Map species to model specific PFTs
       if(any(var.names == 'AGB.pft')){
         spp_id <- match_species_id(unique(dataset$species_id),format_name = 'usda',bety)
         pft_mat <- match_pft(spp_id$bety_species_id, settings$pfts,
                              con = bety$con, allow_missing = TRUE)
         
-        x <- paste0('AGB.pft.', pft_mat$pft)
+        x <- pft_mat$pft
         names(x) <- spp_id$input_code
         
         PEcAn.logger::logger.info('Now, mapping data species to model PFTs')
-        dataset$pft.cat <- x[dataset$species_id]
+        dataset$pft.cat <- x[as.character(dataset$species_id)]
         dataset <- dataset[dataset$pft.cat!='AGB.pft.NA',]
         
-        variable <- c('AbvGrndWood')
-        arguments <- list(.(year, MCMC_iteration, site_id, pft.cat), .(variable))
+        #variable <- c('AbvGrndWood')
+        arguments <- list(.(year, MCMC_iteration, site_id, pft.cat, Tree_number), .(variable))
         arguments2 <- list(.(year, pft.cat), .(variable))
-        arguments3 <- list(.(MCMC_iteration), .(pft.cat, variable), .(year))
+        arguments3 <- list(.(MCMC_iteration,site_id), .(pft.cat, variable), .(year))
       } 
       
       PEcAn.logger::logger.info('Now, aggregating data and creating SDA input lists')
@@ -126,28 +134,27 @@ load_data_paleon_sda <- function(settings){
       mean_mat <- reshape2::dcast(melt.next, arguments2, mean)
       
       iter_mat <- reshape2::acast(melt.next, arguments3, mean)
+      
+      var(melt.next[melt.next$year==1960&melt.next$variable=='AbvGrndWood'&melt.next$pft.cat=='Quercus.Rubra_Northern.Red.Oak','value'])
+      
       cov.test <- apply(iter_mat,3,function(x){cov(x)})
       
+      #renaming to match the data output with variables before pft
+      dimnames(iter_mat)[[2]] <- (paste((rep(variable,length(unique(mean_mat$pft.cat)))),
+                                    sort(rep(unique(mean_mat$pft.cat),length(variable))),sep='_'))
+      
       for(t in seq_along(obs.times)){
-        obs.mean.tmp[[t]] <- mean_mat[mean_mat[,time.type]==obs.times[t], -c(1)] #THIS WONT WORK IF TIMESTEP ISNT ANNUAL
+        mean_time <- mean_mat[mean_mat[,time.type]==obs.times[t],]
+        mean_tmp <- unlist(mean_time) 
         
-        if(any(var.names == 'AGB.pft')){
-          obs.mean.tmp[[t]] <- rep(NA, length(unique(dataset$pft.cat)))
-          names(obs.mean.tmp[[t]]) <- sort(unique(dataset$pft.cat))
-          for(r in seq_along(unique(dataset$pft.cat))){
-            k <- mean_mat[mean_mat$year==obs.times[t] & mean_mat$pft.cat==names(obs.mean.tmp[[t]][r]), variable]
-            if(any(k)){
-              obs.mean.tmp[[t]][r] <- k
-            }
-          }
-        }
+        mean_keep <- as.numeric(mean_tmp[grep(paste(variable,collapse="|"), names(mean_tmp))])
+        names(mean_keep) <- paste(sort(rep(variable,
+                                       length(unique(mean_time$pft.cat)))),
+                              mean_time$pft.cat,sep='_')
+        obs.mean.tmp[[t]] <- mean_keep
         
-        obs.cov.tmp[[t]] <- matrix(cov.test[,which(colnames(cov.test) %in% obs.times[t])],
-                                   ncol = sqrt(dim(cov.test)[1]),
-                                   nrow = sqrt(dim(cov.test)[1]))
-        if(any(var.names == 'AGB.pft')){
-          colnames(obs.cov.tmp[[t]]) <- names(iter_mat[1,,t]) 
-        }
+        order.use <- order(colnames(iter_mat[,,t]))
+        obs.cov.tmp[[t]] <- cov(iter_mat[,,t])[order.use,order.use]
       }
     }
     
@@ -283,7 +290,7 @@ load_data_paleon_sda <- function(settings){
     names(obs.cov) <- paste0(obs.times,'/12/31')
   
   obs.list <- list(obs.mean = obs.mean, obs.cov = obs.cov)
-  save(obs.list,file=file.path(settings$outdir,'sda.obs.Rdata'))
+  save(obs.list,file=file.path(settings$outdir,'sda.obs.gwbi.agb.Rdata'))
 
 return(obs.list)
 
