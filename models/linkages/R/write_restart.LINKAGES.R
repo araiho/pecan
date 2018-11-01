@@ -51,9 +51,9 @@ write_restart.LINKAGES <- function(outdir, runid, start.time, stop.time,
     new.state.other <- new.state.save[grep("Fcomp", names(new.state.save), invert = TRUE)]
   }
   
-  if(any(grep('AGB.pft',names.keep))){
-    new.state <- new.state.save[grep("AGB.pft", names(new.state.save))]
-    new.state.other <- new.state.save[grep("AGB.pft", names(new.state.save), invert = TRUE)]
+  if(any(grep('AbvGrndWood',names.keep))){
+    new.state <- new.state.save[grep("AbvGrndWood", names(new.state.save))]
+    new.state.other <- new.state.save[grep("AbvGrndWood", names(new.state.save), invert = TRUE)]
   }
 
   variables <- names(new.state)
@@ -166,6 +166,8 @@ write_restart.LINKAGES <- function(outdir, runid, start.time, stop.time,
   }else{
     large.trees <- which(dbh >= 20)
   }
+  
+  large.trees <- which(dbh > 0)
   
   for (s in seq_along(settings$pfts)) {
     ntrees[s] <- length(which(n.index[large.trees] == s))
