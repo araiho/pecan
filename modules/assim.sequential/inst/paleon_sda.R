@@ -18,6 +18,8 @@ library(ncdf4) # need to put in assim.sequential
 #setwd('/fs/data2/output//PEcAn_1000008008/')
 setwd('/fs/data2/output//PEcAn_1000009225/')
 
+###LORIMER PRODUCTION RUNS
+#"/fs/data2/output/PEcAn_1000009519"
 
 
 file.copy('/fs/data2/output//PEcAn_1000007999/sda.obs.Rdata',getwd())
