@@ -19,7 +19,7 @@
 ##' @return NONE
 ##' @export
 ##' 
-sda.enkf <- function(settings, obs.mean, obs.cov, IC = NULL, Q = NULL, adjustment = TRUE, restart=NULL) {
+sda.enkf.original <- function(settings, obs.mean, obs.cov, IC = NULL, Q = NULL, adjustment = TRUE, restart=NULL) {
   
   library(nimble)
   
@@ -303,8 +303,6 @@ sda.enkf <- function(settings, obs.mean, obs.cov, IC = NULL, Q = NULL, adjustmen
   if(is.null(restart)){
     PEcAn.remote::start.model.runs(settings, settings$database$bety$write)
   }
-  save(list = ls(envir = environment(), all.names = TRUE), 
-       file = file.path(outdir, "sda.initial.runs.Rdata"), envir = environment())
 
   ###-------------------------------------------------------------------###
   ### tests before data assimilation                                    ###
@@ -476,10 +474,12 @@ sda.enkf <- function(settings, obs.mean, obs.cov, IC = NULL, Q = NULL, adjustmen
   # weight matrix
   wt.mat <- matrix(NA, nrow = nens, ncol = nt)
   
+  save(list = ls(envir = environment(), all.names = TRUE), 
+       file = file.path(outdir, "sda.initial.runs.Rdata"), envir = environment())
+  
   ###-------------------------------------------------------------------###
   ### loop over time                                                    ###
   ###-------------------------------------------------------------------### 
-  
 
 for(t in seq_len(nt)) { #
     if(t == 1){
@@ -918,14 +918,6 @@ for(t in seq_len(nt)) { #
         X.new <- X
       }
       
-      S_f  <- svd(Pf)
-      L_f  <- S_f$d
-      V_f  <- S_f$v
-      
-      S_f  <- svd(Pf)
-      L_f  <- S_f$d
-      V_f  <- S_f$v
-      
       ## normalize
       Z <- X*0
       
@@ -938,22 +930,15 @@ for(t in seq_len(nt)) { #
       }
       Z[is.na(Z)]<-0
       
-      ## analysis
-      S_a  <- svd(Pa)
-      L_a  <- S_a$d
-      V_a  <- S_a$v
-      
-      ## analysis ensemble
-      X_a <- X*0
-      for(i in seq_len(nrow(X))){
-        X_a[i,] <- V_a %*%diag(sqrt(L_a))%*%Z[i,] + mu.a
-      }
-      Z[is.na(Z)]<-0
+      S_f  <- svd(Pf)
+      L_f  <- S_f$d
+      V_f  <- S_f$v
       
       ## analysis
       S_a  <- svd(Pa)
       L_a  <- S_a$d
       V_a  <- S_a$v
+      
       
       ## analysis ensemble
       X_a <- X*0
