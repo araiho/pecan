@@ -5,7 +5,7 @@
 ##' @description This functions is internally used to register a series of nimble functions inside GEF analysis function.
 ##'
 #' @import nimble
-#'
+#' @param X state var
 #'
 #' @export
 y_star_create <-  nimbleFunction(
@@ -18,6 +18,8 @@ y_star_create <-  nimbleFunction(
   }
 )
 
+#' Additive Log Ratio transform
+#' @param y state var
 #' @export
 alr <-  nimbleFunction(
   run = function(y = double(1)) {
@@ -31,6 +33,8 @@ alr <-  nimbleFunction(
   }
 )
 
+#' inverse of ALR transform
+#' @param alr state var
 #' @export
 inv.alr <-  nimbleFunction(
   run = function(alr = double(1)) {
@@ -42,6 +46,11 @@ inv.alr <-  nimbleFunction(
   }
 )
 
+#' random weighted multivariate normal
+#' @param n sample size
+#' @param mean mean
+#' @param prec precision
+#' @param wt weight
 #' @export
 rwtmnorm <- nimbleFunction(
   run = function(n = integer(0),
@@ -57,6 +66,12 @@ rwtmnorm <- nimbleFunction(
   }
 )
 
+#' weighted multivariate normal density
+#' @param x random variable
+#' @param mean mean
+#' @param prec precision
+#' @param wt weight
+#' @param log log
 #' @export
 dwtmnorm <- nimbleFunction(
   run = function(x = double(1),
@@ -94,6 +109,8 @@ registerDistributions(list(dwtmnorm = list(
 )))
 
 #tobit2space.model------------------------------------------------------------------------------------------------
+#' Fit tobit prior to ensemble members
+#' @format TBD
 #' @export
 tobit2space.model <- nimbleCode({
   for (i in 1:N) {
@@ -111,7 +128,9 @@ tobit2space.model <- nimbleCode({
 })
 
 #tobit.model--This does the GEF ----------------------------------------------------
+#' TWEnF
 #' @export
+#' @format TBD
 tobit.model <-  nimbleCode({
   q[1:N, 1:N]  ~ dwish(R = aq[1:N, 1:N], df = bq) ## aq and bq are estimated over time
   Q[1:N, 1:N] <- inverse(q[1:N, 1:N])
@@ -153,6 +172,8 @@ tobit.model <-  nimbleCode({
 })
 
 #tobit.model--This does the GEF for multi Site -------------------------------------
+#' multisite TWEnF
+#' @format TBD
 #' @export
 GEF.MultiSite.Nimble <-  nimbleCode({
   if (q.type == 1) {
@@ -197,7 +218,12 @@ GEF.MultiSite.Nimble <-  nimbleCode({
 })
 
 #sampler_toggle------------------------------------------------------------------------------------------------
+#' sampler toggling
 #' @export
+#' @param model model
+#' @param mvSaved copied to
+#' @param target thing being targetted
+#' @param control unused
 sampler_toggle <- nimbleFunction(
   contains = sampler_BASE,
   setup = function(model, mvSaved, target, control) {
@@ -221,6 +247,11 @@ sampler_toggle <- nimbleFunction(
   )
 )
 
+#' Weighted conjugate wishart
+#' @param model model
+#' @param mvSaved copied to
+#' @param target thing being targetted
+#' @param control unused
 #' @export
 conj_wt_wishart_sampler <-  nimbleFunction(
   contains = sampler_BASE,
